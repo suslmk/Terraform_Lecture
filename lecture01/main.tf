@@ -3,16 +3,28 @@
 ################
 
 provider "aws" {
-  access_key = "xxx"
-  secret_key = "xxx"
+  access_key = ""
+  secret_key = ""
   region = "ap-northeast-2"
 }
 
 ################
 # DATA
 ################
-data "aws_ssm_parameter" "ami" {
-    name = "/ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-20230207"
+data "aws_ami" "ubuntu" {
+    most_recent = true
+
+    filter {
+        name = "name"
+        values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
+    }
+
+    filter {
+        name = "virtualization-type"
+        values = ["hvm"]
+    }
+
+    owners = ["099720109477"]
 }
 
 ################
@@ -28,6 +40,7 @@ resource "aws_vpc" "vpc" {
 resource "aws_subnet" "subnet-1" {
     cidr_block = "172.32.0.0/24"
     vpc_id = aws_vpc.vpc.id
+    availability_zone = "ap-northeast-2a"   # t2.micro 유형은 2a, 2c zone에서만 생성 가능하다.
     map_public_ip_on_launch = true
 }
 
@@ -72,7 +85,7 @@ resource "aws_security_group" "nginx-sg" {
 
 # INSTANCE
 resource "aws_instance" "nginx-1" {
-    ami = nonsensitive(data.aws_ssm_parameter.ami.value)
+    ami = data.aws_ami.ubuntu.id
     instance_type = "t2.micro"
     subnet_id = aws_subnet.subnet-1.id
     vpc_security_group_ids = [aws_security_group.nginx-sg.id]
