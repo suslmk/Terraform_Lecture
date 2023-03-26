@@ -20,4 +20,22 @@ help옵션을 통한 사용법 확인
 terraform --help
 ```
 
+## 1.2 실습 프로젝트 시작
+
+작업할 폴더 생성 및 실습용 TF파일 복사
+```
+mkdir project
+cp lecture01/main.tf ./project/main.tf
+cd project
+```
+
+> 실습용 TF파일 확인 [main.tf](../main.tf)
+
+## 1.3 Terraform 실행
+```
+terraform init
+terraform plan -out exec01.tfplan
+terraform apply exec01.tfplan
+```
+
 
