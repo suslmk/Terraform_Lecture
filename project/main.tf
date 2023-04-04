@@ -2,8 +2,8 @@
 # PROVIDER
 ################
 provider "aws" {
-  access_key = "AKIAYECMG3SPFRY6AAN3"
-  secret_key = "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"
+  access_key = ""
+  secret_key = ""
   region     = "ap-northeast-2"
 }
 
