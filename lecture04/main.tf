@@ -1,16 +1,6 @@
 ################
 # PROVIDER
 ################
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 4.1.0"
-    }
-  }
-
-  required_version = "~> 1.3.9"
-}
 
 provider "aws" {
   access_key = ""
@@ -21,20 +11,8 @@ provider "aws" {
 ################
 # DATA
 ################
-data "aws_ami" "ubuntu" {
-    most_recent = true
-
-    filter {
-        name = "name"
-        values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
-    }
-
-    filter {
-        name = "virtualization-type"
-        values = ["hvm"]
-    }
-
-    owners = ["099720109477"]
+data "aws_ssm_parameter" "ubuntu-focal" {
+    name = "/aws/service/canonical/ubuntu/server/20.04/stable/current/amd64/hvm/ebs-gp2/ami-id"
 }
 
 ################
@@ -95,7 +73,7 @@ resource "aws_security_group" "nginx-sg" {
 
 # INSTANCE
 resource "aws_instance" "nginx-1" {
-    ami = data.aws_ami.ubuntu.id
+    ami = nonsensitive(data.aws_ssm_parameter.ubuntu-focal.value)
     instance_type = "t2.micro"
     subnet_id = aws_subnet.subnet-1.id
     vpc_security_group_ids = [aws_security_group.nginx-sg.id]
